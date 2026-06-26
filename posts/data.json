@@ -4,7 +4,7 @@
     "bio": "记录玩机经历以及经验",
     "avatar": "static/logo.jpg"
   },
-  "tags": ["全部", "Android", "技术","Linux"],
+  "tags": ["全部", "Android", "技术","Linux","c","c++"],
   "posts": [
     {
       "id": "定时方案",

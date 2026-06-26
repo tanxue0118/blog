@@ -1,1 +1,17 @@
-
+﻿{
+  "site": {
+    "name": "叹雪",
+    "bio": "记录玩机经历以及经验",
+    "avatar": "static/logo.jpg"
+  },
+  "tags": ["全部", "Android", "技术","Linux"],
+  "posts": [
+    {
+      "id": "定时方案",
+      "title": "定时方案epoll+timerfd（收录自酷安@海边会下雪么）",
+      "date": "2026-06-26",
+      "tags": ["Linux", "技术"],
+      "excerpt": "定时方案epoll+timerfd的详细讲解，一种更高效，更稳定，开销更低的内核定时方案"
+    }
+  ]
+}

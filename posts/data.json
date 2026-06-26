@@ -4,14 +4,35 @@
     "bio": "记录玩机经历以及经验",
     "avatar": "static/logo.jpg"
   },
-  "tags": ["全部", "Android", "技术","Linux","c","c++"],
+  "tags": ["全部", "Android", "技术","Linux"],
   "posts": [
+    {
+      "id": "SQLite VACUUM 数据库优化技术",
+      "title": "SQLite VACUUM 数据库优化技术（整理自酷安@海边会下雪么）",
+      "date": "2026-06-26",
+      "tags": ["Android", "技术"],
+      "excerpt": "详解 SQLite VACUUM 的工作原理、空间回收判断、WAL 注意事项，以及数据库整理的执行策略"
+    },
     {
       "id": "定时方案",
       "title": "定时方案epoll+timerfd（收录自酷安@海边会下雪么）",
       "date": "2026-06-26",
-      "tags": ["Linux", "技术","c","c++"],
-      "excerpt": "定时方案epoll+timerfd的详细讲解，一种更高效，更稳定，开销更低的内核定时方案"
+      "tags": ["Linux", "技术"],
+      "excerpt": "整理 epoll、timerfd、小顶堆和 inotify 的定时任务调度思路，兼顾低开销与可读性"
+    },
+    {
+      "id": "线程分配与 CPU 亲和性规则整理",
+      "title": "线程分配与 CPU 亲和性规则整理（整理自酷安@Aloazny）",
+      "date": "2026-06-26",
+      "tags": ["Android", "技术"],
+      "excerpt": "整理线程名匹配、CPU 核心亲和、日常应用、游戏和子进程的线程分配思路"
+    },
+    {
+      "id": "ZRAM 压缩算法与后台留存机制",
+      "title": "ZRAM 压缩算法与后台留存机制",
+      "date": "2026-06-26",
+      "tags": ["Android", "Linux", "技术"],
+      "excerpt": "梳理 ZRAM、LMKD、kswapd、PSI、水位线与 MGLRU 对后台留存和系统流畅度的影响"
     }
   ]
 }

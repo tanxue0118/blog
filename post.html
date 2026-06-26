@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文章 - 我的博客</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="static/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css" id="hljs-theme">
+</head>
+
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-inner">
+            <div class="sidebar-header">
+                <div class="avatar">
+                    <img src="static/logo.jpg" alt="头像">
+                </div>
+                <h2 class="sidebar-name">叹雪</h2>
+                <p class="sidebar-bio">记录玩机经历以及经验</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <i class="ri-home-4-line"></i>
+                    <span>首页</span>
+                </a>
+                <a href="https://github.com/tanxue0118" target="_blank" class="sidebar-link">
+                    <i class="ri-github-line"></i>
+                    <span>GitHub</span>
+                </a>
+                <a href="https://tanxue.qzz.io/" target="_blank" class="sidebar-link">
+                    <i class="ri-links-line"></i>
+                    <span>个人主页</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-tags">
+                <h3 class="sidebar-section-title">标签</h3>
+                <div class="tag-list" id="tag-list"></div>
+            </div>
+
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="ri-moon-line"></i>
+                    <span>深色模式</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 遮罩层 -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- 主内容 -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-btn" id="menu-btn">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <button class="sidebar-toggle" id="sidebar-toggle" title="收起侧边栏">
+                    <i class="ri-side-bar-line"></i>
+                </button>
+            </div>
+            <h1 class="topbar-title" id="topbar-title">文章</h1>
+            <button class="theme-btn" id="theme-btn">
+                <i class="ri-moon-line"></i>
+            </button>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <a href="index.html" class="back-link">← 返回首页</a>
+
+                <article class="post-header">
+                    <h1 class="post-title" id="post-title">加载中...</h1>
+                    <div class="post-meta">
+                        <time id="post-date">--</time>
+                        <span id="post-tag-area"><span class="tag" id="post-tag">--</span></span>
+                    </div>
+                </article>
+
+                <div class="post-content" id="post-content">
+                    <p>加载中...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>© 2026 叹雪的小本本 · 用心写作</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    <script src="static/script.js"></script>
+    <script>
+        (function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var postId = urlParams.get('id');
+            var titleEl = document.getElementById('post-title');
+            var contentEl = document.getElementById('post-content');
+
+            if (!postId) {
+                titleEl.textContent = '文章未找到';
+                contentEl.innerHTML = '<p>请从首页选择文章。</p>';
+                return;
+            }
+
+            fetch('posts/data.json')
+                .then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function(data) {
+                    var post = null;
+                    for (var i = 0; i < data.posts.length; i++) {
+                        if (data.posts[i].id === postId) { post = data.posts[i]; break; }
+                    }
+
+                    if (!post) {
+                        titleEl.textContent = '文章未找到';
+                        contentEl.innerHTML = '<p>找不到指定的文章。</p>';
+                        return Promise.reject('文章未找到');
+                    }
+
+                    document.title = post.title + ' - 我的博客';
+                    document.getElementById('topbar-title').textContent = post.title;
+                    titleEl.textContent = post.title;
+                    document.getElementById('post-date').textContent = post.date;
+
+                    var tagArea = document.getElementById('post-tag-area');
+                    if (post.tags && post.tags.length > 0) {
+                        var tagColors = { '中文': 'tag-green', 'English': 'tag-blue', 'Android': 'tag-green', '技术': 'tag-blue' };
+                        var tagsHtml = '';
+                        for (var t = 0; t < post.tags.length; t++) {
+                            var tc = tagColors[post.tags[t]] || 'tag-blue';
+                            tagsHtml += '<span class="tag ' + tc + '">' + post.tags[t] + '</span>';
+                        }
+                        tagArea.innerHTML = tagsHtml;
+                    } else {
+                        tagArea.innerHTML = '';
+                    }
+
+                    var tagList = document.getElementById('tag-list');
+                    if (data.tags) {
+                        var html = '';
+                        for (var j = 0; j < data.tags.length; j++) {
+                            var t = data.tags[j];
+                            var href = t === '全部' ? 'index.html' : 'index.html?tag=' + encodeURIComponent(t);
+                            html += '<a href="' + href + '" class="tag-item">' + t + '</a>';
+                        }
+                        tagList.innerHTML = html;
+                    }
+
+                    return fetch('posts/' + postId + '.md');
+                })
+                .then(function(r) {
+                    if (!r.ok) throw new Error('MD HTTP ' + r.status);
+                    return r.text();
+                })
+                .then(function(md) {
+                    contentEl.innerHTML = marked.parse(md);
+                    var blocks = contentEl.querySelectorAll('pre code');
+                    for (var i = 0; i < blocks.length; i++) {
+                        hljs.highlightElement(blocks[i]);
+                    }
+                })
+                .catch(function(err) {
+                    console.error('加载失败:', err);
+                    if (titleEl.textContent === '加载中...') titleEl.textContent = '加载失败';
+                    if (contentEl.innerHTML.indexOf('加载中') !== -1) {
+                        contentEl.innerHTML = '<p>加载文章内容失败。</p>';
+                    }
+                });
+        })();
+    </script>
+</body>
+
+</html>

@@ -679,6 +679,10 @@ body.sidebar-collapsed .sidebar-toggle i {
         display: flex;
     }
 
+    .sidebar-toggle {
+        display: none;
+    }
+
     .topbar-title {
         font-size: 16px;
     }

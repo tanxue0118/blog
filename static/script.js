@@ -74,12 +74,16 @@
     var postsList = document.getElementById('posts-list');
     var tagList = document.getElementById('tag-list');
     var pageInfo = document.getElementById('page-info');
+    var prevPage = document.getElementById('prev-page');
+    var nextPage = document.getElementById('next-page');
 
     if (!postsList && !tagList) return;
 
     var urlParams = new URLSearchParams(window.location.search);
     var currentTag = urlParams.get('tag') || '全部';
     var allPosts = [];
+    var currentPage = 1;
+    var postsPerPage = 5;
 
     fetch('posts/data.json')
         .then(function(r) {
@@ -106,6 +110,7 @@
                     items[j].onclick = function(e) {
                         e.preventDefault();
                         currentTag = this.textContent;
+                        currentPage = 1;
                         var newUrl = currentTag === '全部' ? 'index.html' : 'index.html?tag=' + encodeURIComponent(currentTag);
                         history.pushState(null, '', newUrl);
                         for (var k = 0; k < items.length; k++) items[k].classList.remove('active');
@@ -138,13 +143,19 @@
         if (filtered.length === 0) {
             postsList.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">暂无文章</p>';
             if (pageInfo) pageInfo.textContent = '共 0 篇文章';
+            updatePagination(1, 0);
             return;
         }
 
+        var totalPages = Math.ceil(filtered.length / postsPerPage);
+        if (currentPage > totalPages) currentPage = totalPages;
+        var start = (currentPage - 1) * postsPerPage;
+        var pagePosts = filtered.slice(start, start + postsPerPage);
+
         var tagColors = { '中文': 'tag-green', 'English': 'tag-blue', 'Android': 'tag-green', '技术': 'tag-blue' };
         var html = '';
-        for (var i = 0; i < filtered.length; i++) {
-            var p = filtered[i];
+        for (var i = 0; i < pagePosts.length; i++) {
+            var p = pagePosts[i];
             html += '<article class="post">';
             html += '<div class="post-meta"><time>' + p.date + '</time>';
             if (p.tags) {
@@ -159,6 +170,33 @@
             html += '</article>';
         }
         postsList.innerHTML = html;
-        if (pageInfo) pageInfo.textContent = '共 ' + filtered.length + ' 篇文章';
+        if (pageInfo) pageInfo.textContent = '第 ' + currentPage + '/' + totalPages + ' 页 · 共 ' + filtered.length + ' 篇文章';
+        updatePagination(totalPages, filtered.length);
+    }
+
+    function updatePagination(totalPages, totalPosts) {
+        if (!prevPage || !nextPage) return;
+
+        var hasPosts = totalPosts > 0;
+        prevPage.classList.toggle('disabled', !hasPosts || currentPage <= 1);
+        nextPage.classList.toggle('disabled', !hasPosts || currentPage >= totalPages);
+    }
+
+    if (prevPage) {
+        prevPage.onclick = function(e) {
+            e.preventDefault();
+            if (prevPage.classList.contains('disabled')) return;
+            currentPage--;
+            renderPosts();
+        };
+    }
+
+    if (nextPage) {
+        nextPage.onclick = function(e) {
+            e.preventDefault();
+            if (nextPage.classList.contains('disabled')) return;
+            currentPage++;
+            renderPosts();
+        };
     }
 })();

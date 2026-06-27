@@ -1,4 +1,4 @@
-﻿{
+{
   "site": {
     "name": "叹雪",
     "bio": "记录玩机经历以及经验",
@@ -31,7 +31,7 @@
       "id": "ZRAM 压缩算法与后台留存机制",
       "title": "ZRAM 压缩算法与后台留存机制",
       "date": "2026-06-26",
-      "tags": ["Android", "Linux", "技术"],
+      "tags": ["Android", "Linux"],
       "excerpt": "梳理 ZRAM、swap、writeback、swappiness、LMKD、kswapd、水位线与 MGLRU 对后台留存的影响"
     }
   ]

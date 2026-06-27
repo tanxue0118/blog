@@ -32,7 +32,7 @@
       "title": "ZRAM 压缩算法与后台留存机制",
       "date": "2026-06-26",
       "tags": ["Android", "Linux", "技术"],
-      "excerpt": "梳理 ZRAM、LMKD、kswapd、PSI、水位线与 MGLRU 对后台留存和系统流畅度的影响"
+      "excerpt": "梳理 ZRAM、swap、writeback、swappiness、LMKD、kswapd、水位线与 MGLRU 对后台留存的影响"
     }
   ]
 }

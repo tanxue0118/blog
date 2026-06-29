@@ -46,6 +46,11 @@
                 <div class="tag-list" id="tag-list"></div>
             </div>
 
+            <div class="sidebar-stats" id="post-sidebar-counter-wrap" hidden>
+                <h3 class="sidebar-section-title">统计</h3>
+                <img class="counter-image" id="post-sidebar-counter" alt="文章访问统计">
+            </div>
+
             <div class="sidebar-footer">
                 <button id="theme-toggle" class="theme-toggle">
                     <i class="ri-moon-line"></i>
@@ -107,6 +112,15 @@
             var postId = urlParams.get('id');
             var titleEl = document.getElementById('post-title');
             var contentEl = document.getElementById('post-content');
+            var counterWrap = document.getElementById('post-sidebar-counter-wrap');
+            var counterEl = document.getElementById('post-sidebar-counter');
+            var counterId = postId ? postId.replace(/\s+/g, '') : '';
+
+            if (counterId && counterWrap && counterEl) {
+                counterEl.src = 'https://count.getloli.com/@' + encodeURIComponent('tanxue0118-blog-' + counterId) + '?theme=moebooru&darkmode=auto';
+                counterEl.alt = '文章访问统计';
+                counterWrap.hidden = false;
+            }
 
             if (!postId) {
                 titleEl.textContent = '文章未找到';
@@ -135,6 +149,11 @@
                     document.getElementById('topbar-title').textContent = post.title;
                     titleEl.textContent = post.title;
                     document.getElementById('post-date').textContent = post.date;
+
+                    if (counterWrap && counterEl) {
+                        counterEl.alt = post.title + ' 访问统计';
+                        counterWrap.hidden = false;
+                    }
 
                     var tagArea = document.getElementById('post-tag-area');
                     if (post.tags && post.tags.length > 0) {

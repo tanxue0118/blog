@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="920" height="470" viewBox="0 0 920 470" role="img" aria-labelledby="title desc">
+  <title id="title">SQLite database maintenance strategy</title>
+  <desc id="desc">A maintenance strategy diagram for running SQLite VACUUM after measuring freelist pages and checkpointing WAL.</desc>
+  <rect width="920" height="470" fill="#f8fafc"/>
+  <text x="42" y="54" font-family="Arial, sans-serif" font-size="28" font-weight="700" fill="#172033">SQLite 数据库整理策略</text>
+  <text x="42" y="86" font-family="Arial, sans-serif" font-size="15" fill="#52616f">先判断收益，再选择低负载窗口执行，最后记录整理效果。</text>
+
+  <g transform="translate(62 142)">
+    <rect x="0" y="0" width="176" height="116" rx="10" fill="#ffffff" stroke="#d7dee8"/>
+    <circle cx="30" cy="34" r="16" fill="#5b8def"/>
+    <text x="25" y="40" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">1</text>
+    <text x="58" y="38" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1c2a39">测量空间</text>
+    <text x="24" y="72" font-family="Arial, sans-serif" font-size="13" fill="#52616f">page_count</text>
+    <text x="24" y="94" font-family="Arial, sans-serif" font-size="13" fill="#52616f">freelist_count</text>
+  </g>
+
+  <path d="M256 200h58" stroke="#7a8797" stroke-width="3" stroke-linecap="round"/>
+  <path d="M314 200l-14-9v18z" fill="#7a8797"/>
+
+  <g transform="translate(332 142)">
+    <rect x="0" y="0" width="176" height="116" rx="10" fill="#ffffff" stroke="#d7dee8"/>
+    <circle cx="30" cy="34" r="16" fill="#57b894"/>
+    <text x="25" y="40" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">2</text>
+    <text x="58" y="38" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1c2a39">处理 WAL</text>
+    <text x="24" y="72" font-family="Arial, sans-serif" font-size="13" fill="#52616f">checkpoint</text>
+    <text x="24" y="94" font-family="Arial, sans-serif" font-size="13" fill="#52616f">必要时 TRUNCATE</text>
+  </g>
+
+  <path d="M526 200h58" stroke="#7a8797" stroke-width="3" stroke-linecap="round"/>
+  <path d="M584 200l-14-9v18z" fill="#7a8797"/>
+
+  <g transform="translate(602 142)">
+    <rect x="0" y="0" width="176" height="116" rx="10" fill="#ffffff" stroke="#d7dee8"/>
+    <circle cx="30" cy="34" r="16" fill="#f0b35a"/>
+    <text x="25" y="40" font-family="Arial, sans-serif" font-size="16" font-weight="700" fill="#ffffff">3</text>
+    <text x="58" y="38" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#1c2a39">执行整理</text>
+    <text x="24" y="72" font-family="Arial, sans-serif" font-size="13" fill="#52616f">低负载窗口</text>
+    <text x="24" y="94" font-family="Arial, sans-serif" font-size="13" fill="#52616f">避免活跃事务</text>
+  </g>
+
+  <g transform="translate(196 324)">
+    <rect x="0" y="0" width="528" height="70" rx="12" fill="#ffffff" stroke="#d7dee8"/>
+    <text x="28" y="30" font-family="Arial, sans-serif" font-size="17" font-weight="700" fill="#1c2a39">验证效果</text>
+    <text x="28" y="54" font-family="Arial, sans-serif" font-size="14" fill="#52616f">再次读取 page_count / freelist_count，并记录文件大小变化和耗时。</text>
+  </g>
+</svg>

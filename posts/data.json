@@ -1,4 +1,4 @@
-{
+﻿{
   "site": {
     "name": "叹雪",
     "bio": "记录玩机经历以及经验",
@@ -6,6 +6,13 @@
   },
   "tags": ["全部", "Android", "技术","Linux"],
   "posts": [
+    {
+      "id": "如何清理垃圾进程",
+      "title": "如何清理垃圾进程",
+      "date": "2026-06-29",
+      "tags": ["Android", "Linux"],
+      "excerpt": "研究该如何杀死无用进程"
+    },
     {
       "id": "SQLite VACUUM 数据库优化技术",
       "title": "SQLite VACUUM 数据库优化技术（整理自酷安@海边会下雪么）",
@@ -31,7 +38,7 @@
       "id": "ZRAM 压缩算法与后台留存机制",
       "title": "ZRAM 压缩算法与后台留存机制",
       "date": "2026-06-26",
-      "tags": ["Android", "Linux"],
+      "tags": ["Android", "Linux", "技术"],
       "excerpt": "梳理 ZRAM、swap、writeback、swappiness、LMKD、kswapd、水位线与 MGLRU 对后台留存的影响"
     }
   ]

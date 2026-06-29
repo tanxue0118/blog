@@ -69,6 +69,24 @@ PRAGMA freelist_count;
 
 如果 `freelist_count` 很小，执行 `VACUUM` 的收益就有限。如果刚删除了大量聊天记录、日志、缓存索引或历史数据，`freelist_count` 明显上升，这时整理更有意义。
 
+如果你想直接在 `sqlite3` 里看一眼回收量，也可以把几个统计值一起算出来。下面这段是 SQL 示例：
+
+```sql
+WITH stats AS (
+  SELECT
+    (SELECT page_size FROM pragma_page_size) AS page_size,
+    (SELECT page_count FROM pragma_page_count) AS page_count,
+    (SELECT freelist_count FROM pragma_freelist_count) AS freelist_count
+)
+SELECT
+  page_size,
+  page_count,
+  freelist_count,
+  freelist_count * page_size AS reclaim_bytes,
+  ROUND(1.0 * freelist_count / NULLIF(page_count, 0), 4) AS free_ratio
+FROM stats;
+```
+
 ## 执行时机
 
 `VACUUM` 需要对数据库做独占整理，不适合在业务高峰期执行。对于移动端应用，比较适合的时机通常是：
@@ -163,10 +181,60 @@ PRAGMA page_count;
 
 Android 应用经常把配置、聊天、日志、索引、缓存元信息写进 SQLite。长期使用后，用户删除了大量数据，但 `.db` 文件仍然很大，这是很典型的可整理场景。
 
-如果应用自己控制数据库连接，可以在合适时机执行：
+如果应用自己控制数据库连接，可以把“先判断、再整理”写成一个小函数，再挂到后台任务里。下面这段是 Kotlin 示例：
 
-```sql
-VACUUM;
+```kotlin
+data class VacuumStats(
+    val pageSize: Long,
+    val pageCount: Long,
+    val freelistCount: Long,
+) {
+    val reclaimBytes: Long get() = pageSize * freelistCount
+    val freeRatio: Double get() =
+        if (pageCount == 0L) 0.0 else freelistCount.toDouble() / pageCount
+}
+
+private fun readPragmaLong(db: SQLiteDatabase, pragma: String): Long {
+    val cursor = db.rawQuery("PRAGMA $pragma", null)
+    return try {
+        if (cursor.moveToFirst()) cursor.getLong(0) else 0L
+    } finally {
+        cursor.close()
+    }
+}
+
+fun collectVacuumStats(db: SQLiteDatabase): VacuumStats = VacuumStats(
+    pageSize = readPragmaLong(db, "page_size"),
+    pageCount = readPragmaLong(db, "page_count"),
+    freelistCount = readPragmaLong(db, "freelist_count"),
+)
+
+fun shouldVacuum(stats: VacuumStats): Boolean {
+    val reclaimThreshold = 8L * 1024 * 1024
+    val freeRatioThreshold = 0.15
+    return stats.reclaimBytes >= reclaimThreshold || stats.freeRatio >= freeRatioThreshold
+}
+
+suspend fun vacuumIfNeeded(db: SQLiteDatabase): Boolean = withContext(Dispatchers.IO) {
+    val stats = collectVacuumStats(db)
+    if (!shouldVacuum(stats)) return@withContext false
+
+    db.execSQL("PRAGMA wal_checkpoint(TRUNCATE)")
+    db.execSQL("VACUUM")
+    true
+}
+
+override suspend fun doWork(): Result = try {
+    val db = dbProvider()
+    try {
+        vacuumIfNeeded(db)
+        Result.success()
+    } finally {
+        db.close()
+    }
+} catch (_: Throwable) {
+    Result.retry()
+}
 ```
 
 如果使用框架封装数据库，也要确保执行时没有外层事务，没有其他线程正在大量读写同一个库。对用户体验来说，宁可少执行，也不要在前台交互时突然触发重 I/O。

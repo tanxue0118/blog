@@ -114,10 +114,10 @@
             var contentEl = document.getElementById('post-content');
             var counterWrap = document.getElementById('post-sidebar-counter-wrap');
             var counterEl = document.getElementById('post-sidebar-counter');
-            var counterId = postId ? postId.replace(/\s+/g, '') : '';
+            var counterId = postId || '';
 
             if (counterId && counterWrap && counterEl) {
-                counterEl.src = 'https://count.getloli.com/@' + encodeURIComponent('tanxue0118-blog-' + counterId) + '?theme=moebooru&darkmode=auto';
+                counterEl.src = 'https://count.getloli.com/@' + encodeURIComponent(counterId) + '?theme=moebooru&darkmode=auto';
                 counterEl.alt = '文章访问统计';
                 counterWrap.hidden = false;
             }

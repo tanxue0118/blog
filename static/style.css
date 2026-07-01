@@ -3,6 +3,7 @@
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
+    color-scheme: light;
     --bg: #ffffff;
     --bg-soft: #f7f7f5;
     --sidebar-bg: #fafaf8;
@@ -20,6 +21,7 @@
 }
 
 [data-theme="dark"] {
+    color-scheme: dark;
     --bg: #191919;
     --bg-soft: #202020;
     --sidebar-bg: #1e1e1e;
@@ -31,6 +33,30 @@
     --accent-light: #1a3a4c;
     --green: #4dab9a;
     --green-light: #1a3a30;
+}
+
+[data-theme="dark"],
+[data-theme="dark"] .sidebar {
+    scrollbar-color: #777 #1f1f1f;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar {
+    width: 14px;
+    height: 14px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-track {
+    background: #1f1f1f;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: #777;
+    border: 3px solid #1f1f1f;
+    border-radius: 999px;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: #8a8a8a;
 }
 
 * {

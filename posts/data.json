@@ -4,8 +4,15 @@
     "bio": "记录玩机经历以及经验",
     "avatar": "static/logo.jpg"
   },
-  "tags": ["全部", "Android", "技术","Linux"],
+  "tags": ["全部", "Android", "技术","Linux", "底层"],
   "posts": [
+    {
+      "id": "关于充电方面的问题",
+      "title": "关于充电方面的问题",
+      "date": "2026-07-01",
+      "tags": ["Android", "底层"],
+      "excerpt": "梳理手机快充受电池、BMS、充电协议、线材内阻、纹波和温控策略影响的原因"
+    },
     {
       "id": "如何清理垃圾进程",
       "title": "如何清理垃圾进程",

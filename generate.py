@@ -13,6 +13,14 @@ DATA_PATH = os.path.join(ROOT, 'posts', 'data.json')
 PRIVATE_DIR = os.path.join(ROOT, 'posts', 'private')
 KEY_PATH = os.path.join(ROOT, 'private.key')
 OUT_DIR = os.path.join(ROOT, 'p')
+PHOTOS_DIR = os.path.join(ROOT, 'photos')
+PHOTOS_DATA_PATH = os.path.join(PHOTOS_DIR, 'data.json')
+PHOTOS_IMAGES_DIR = os.path.join(PHOTOS_DIR, 'images')
+PHOTOS_THUMBS_DIR = os.path.join(PHOTOS_DIR, 'thumbs')
+
+# 缩略图规格：small 用于网格，large 用于灯箱
+THUMB_SIZES = {'small': 600, 'large': 1600}
+THUMB_EXTS = ('.jpg', '.jpeg', '.png', '.webp', '.gif')
 
 PRIVATE_TEMPLATE = '''<!DOCTYPE html>
 <html lang="zh-CN">
@@ -233,6 +241,10 @@ TEMPLATE = '''<!DOCTYPE html>
                 <a href="../../archive.html" class="sidebar-link">
                     <i class="ri-archive-line"></i>
                     <span>归档</span>
+                </a>
+                <a href="../../photos.html" class="sidebar-link">
+                    <i class="ri-image-line"></i>
+                    <span>相册</span>
                 </a>
                 <a href="https://github.com/tanxue0118" target="_blank" class="sidebar-link">
                     <i class="ri-github-line"></i>
@@ -530,5 +542,104 @@ def main():
         print('generated {0} private (encrypted) pages into p/'.format(count))
 
 
+def build_photos():
+    """根据 photos/data.json 和 photos/images/ 生成 small/large 两档缩略图"""
+    if not os.path.isfile(PHOTOS_DATA_PATH):
+        print('WARNING: photos/data.json missing, skipped photo build.')
+        return
+
+    with open(PHOTOS_DATA_PATH, encoding='utf-8-sig') as f:
+        data = json.load(f)
+
+    albums = data.get('albums', [])
+    entries = data.get('entries', [])
+
+    # 收集每个条目引用的照片文件名
+    def entry_files(e):
+        t = e.get('type', 'photo')
+        if t == 'text':
+            return []
+        if t == 'group':
+            return [f for f in e.get('files', []) if f]
+        f_ = e.get('file')
+        return [f_] if f_ else []
+
+    def entry_label(e):
+        return e.get('title') or e.get('text', '')[:20] or '(untitled)'
+
+    # 校验：album 必须已声明
+    album_set = set(a for a in albums if a != '全部')
+    for e in entries:
+        a = e.get('album')
+        if a and a not in album_set:
+            print('WARNING: entry "{0}" uses undeclared album "{1}"'.format(entry_label(e), a))
+
+    # 校验：文字条目必须有 text；图片文件必须存在于 images/
+    for e in entries:
+        if e.get('type') == 'text' and not e.get('text'):
+            print('WARNING: text entry without "text" field.')
+        for f_ in entry_files(e):
+            src = os.path.join(PHOTOS_IMAGES_DIR, f_)
+            if not os.path.isfile(src):
+                print('WARNING: missing photo file: photos/images/{0}'.format(f_))
+
+    try:
+        from PIL import Image
+    except ImportError:
+        print('WARNING: Pillow not installed, skipped thumbnail generation.')
+        return
+
+    generated = 0
+    skipped = 0
+    seen = set()
+    for e in entries:
+        for fname in entry_files(e):
+            if fname in seen:
+                continue
+            seen.add(fname)
+            src = os.path.join(PHOTOS_IMAGES_DIR, fname)
+            if not os.path.isfile(src):
+                continue
+
+            ext = os.path.splitext(fname)[1].lower()
+            if ext not in THUMB_EXTS:
+                print('WARNING: unsupported photo extension: {0}'.format(fname))
+                continue
+
+            for size_name, max_side in THUMB_SIZES.items():
+                out_dir = os.path.join(PHOTOS_THUMBS_DIR, size_name)
+                if not os.path.isdir(out_dir):
+                    os.makedirs(out_dir)
+                # 统一输出为 .jpg（GIF 保留 .gif 以支持动图）
+                if ext == '.gif':
+                    out_fname = fname
+                else:
+                    out_fname = os.path.splitext(fname)[0] + '.jpg'
+                out_path = os.path.join(out_dir, out_fname)
+
+                # 增量：缩略图比原图新就跳过
+                if os.path.isfile(out_path) and os.path.getmtime(out_path) >= os.path.getmtime(src):
+                    skipped += 1
+                    continue
+
+                try:
+                    im = Image.open(src)
+                    if getattr(im, 'is_animated', False):
+                        im.seek(0)
+                    im = im.convert('RGB') if im.mode not in ('RGB', 'L') else im
+                    im.thumbnail((max_side, max_side), Image.LANCZOS)
+                    if ext == '.gif':
+                        im.save(out_path, optimize=True)
+                    else:
+                        im.save(out_path, 'JPEG', quality=82, optimize=True)
+                    generated += 1
+                except Exception as ex:
+                    print('WARNING: failed to generate thumb for {0}: {1}'.format(fname, ex))
+
+    print('photos: {0} entries, {1} unique files, {2} thumbs generated, {3} skipped'.format(
+        len(entries), len(seen), generated, skipped))
+
+
 if __name__ == '__main__':
     main()
+    build_photos()

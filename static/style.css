@@ -927,6 +927,221 @@ body.sidebar-collapsed .sidebar-toggle i {
     color: #fff;
 }
 
+/* ── 相册页 ── */
+.album-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.album-tab {
+    padding: 6px 14px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-soft);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-family: inherit;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+
+.album-tab:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+}
+
+.album-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+/* 日期分区 */
+.day-section {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.day-section + .day-section {
+    margin-top: 28px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+}
+
+.day-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.day-date {
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    margin: 0;
+}
+
+.day-meta {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+}
+
+.day-meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.day-meta-item i {
+    font-size: 14px;
+}
+
+.photo-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+}
+
+/* 相册里的文字随笔（无卡片，融入照片之间的旁白） */
+.text-card {
+    position: relative;
+    padding: 32px 24px;
+    text-align: center;
+}
+
+.text-card::before {
+    content: '';
+    display: block;
+    width: 36px;
+    height: 1px;
+    margin: 0 auto 18px;
+    background: var(--border);
+}
+
+.text-card-body {
+    font-family: var(--serif);
+    font-size: 15px;
+    line-height: 2.2;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    margin: 0 auto;
+    max-width: 560px;
+}
+
+/* 一组照片 / 单张照片（无卡片壳，内容直连） */
+.photo-group,
+.photo-single {
+    padding: 0;
+}
+
+.photo-group-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-bottom: 10px;
+}
+
+.photo-group-title {
+    font-family: var(--serif);
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text);
+    margin: 0;
+}
+
+.photo-group-text {
+    font-size: 14px;
+    line-height: 1.9;
+    color: var(--text-secondary);
+    margin: 0 0 14px;
+    max-width: 640px;
+}
+
+.photo-group-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.photo-group-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--border);
+    cursor: zoom-in;
+    transition: transform 0.2s ease;
+}
+
+.photo-group-item:hover {
+    transform: scale(1.02);
+}
+
+.photo-group-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* 单张照片：完整展示不裁切 */
+.photo-single-img {
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--border);
+    cursor: zoom-in;
+}
+
+.photo-single-img img {
+    width: 100%;
+    display: block;
+}
+
+.photo-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 60px 0;
+    font-size: 14px;
+}
+
+/* 相册灯箱扩展（左右切换） */
+.lightbox-prev,
+.lightbox-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+
+.lightbox-prev:hover,
+.lightbox-next:hover {
+    background: rgba(255, 255, 255, 0.28);
+}
+
+.lightbox-prev { left: 20px; }
+.lightbox-next { right: 20px; }
+
 /* ── 404 页 ── */
 .notfound {
     text-align: center;
@@ -1015,6 +1230,20 @@ body.sidebar-collapsed .sidebar-toggle i {
 
     .archive-link {
         white-space: normal;
+    }
+
+    .photo-group-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .lightbox-prev { left: 8px; }
+    .lightbox-next { right: 8px; }
+
+    .lightbox-prev,
+    .lightbox-next {
+        width: 38px;
+        height: 38px;
+        font-size: 20px;
     }
 
     .notfound {

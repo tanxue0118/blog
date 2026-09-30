@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/jpeg" href="static/logo.jpg">
+    <meta name="description" content="页面走丢了 - 叹雪的小本本">
+    <title>404 - 叹雪的小本本</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-inner">
+            <div class="sidebar-header">
+                <div class="avatar">
+                    <img src="static/logo.jpg" alt="头像">
+                </div>
+                <h2 class="sidebar-name">叹雪</h2>
+                <p class="sidebar-bio">记录一切</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <i class="ri-home-4-line"></i>
+                    <span>首页</span>
+                </a>
+                <a href="archive.html" class="sidebar-link">
+                    <i class="ri-archive-line"></i>
+                    <span>归档</span>
+                </a>
+                <a href="https://github.com/tanxue0118" target="_blank" class="sidebar-link">
+                    <i class="ri-github-line"></i>
+                    <span>GitHub</span>
+                </a>
+                <a href="https://tanxue.qzz.io/" target="_blank" class="sidebar-link">
+                    <i class="ri-links-line"></i>
+                    <span>个人主页</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="ri-moon-line"></i>
+                    <span>深色模式</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 遮罩层 -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- 主内容 -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-btn" id="menu-btn">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <button class="sidebar-toggle" id="sidebar-toggle" title="收起侧边栏">
+                    <i class="ri-side-bar-line"></i>
+                </button>
+            </div>
+            <h1 class="topbar-title">404</h1>
+            <button class="theme-btn" id="theme-btn">
+                <i class="ri-moon-line"></i>
+            </button>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <div class="notfound">
+                    <div class="notfound-code">404</div>
+                    <p class="notfound-text">页面走丢了，可能已被移动或删除</p>
+                    <a href="index.html" class="notfound-home">返回首页</a>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>叹雪的小本本</p>
+        </footer>
+    </div>
+
+    <script src="static/script.js"></script>
+</body>
+
+</html>

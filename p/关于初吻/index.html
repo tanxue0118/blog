@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/jpeg" href="../../static/logo.jpg">
+    <meta name="robots" content="noindex, nofollow">
+    <title>关于初吻（收录自可爱的小女友） - 叹雪的小本本</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="../../static/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css" id="hljs-theme">
+    <style>
+        .private-lock { text-align: center; padding: 64px 0; }
+        .private-lock-icon { font-size: 40px; color: var(--text-muted); margin-bottom: 16px; }
+        .private-lock-text { font-size: 15px; color: var(--text-secondary); margin-bottom: 24px; }
+        .private-lock-input {
+            width: min(100%, 320px); padding: 12px 14px; font-size: 15px;
+            border: 1px solid var(--border); border-radius: 8px;
+            background: var(--bg-soft); color: var(--text);
+            font-family: inherit; outline: none; text-align: center;
+            transition: border-color 0.2s;
+        }
+        .private-lock-input:focus { border-color: var(--accent); }
+        .private-lock-btn {
+            margin-top: 12px; padding: 10px 28px; border: none; border-radius: 8px;
+            background: var(--accent); color: #fff; font-size: 14px; font-family: inherit;
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        .private-lock-btn:hover { opacity: 0.85; }
+        .private-lock-error { margin-top: 12px; font-size: 13px; color: #dc2626; display: none; }
+        .private-lock-error.show { display: block; }
+    </style>
+</head>
+
+<body>
+    <!-- 阅读进度条 -->
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- 主内容（无侧边栏） -->
+    <div class="main-wrapper" style="margin-left:0">
+        <header class="topbar">
+            <div class="topbar-left"></div>
+            <h1 class="topbar-title">关于初吻（收录自可爱的小女友）</h1>
+            <button class="theme-btn" id="theme-btn">
+                <i class="ri-moon-line"></i>
+            </button>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <article class="post-header">
+                    <h1 class="post-title">关于初吻（收录自可爱的小女友）</h1>
+                    <div class="post-meta">
+                        <time>2026-07-06</time>
+                    </div>
+                </article>
+
+                <div class="private-lock" id="private-lock">
+                    <div class="private-lock-icon"><i class="ri-lock-2-line"></i></div>
+                    <p class="private-lock-text">这是一篇私密文章，请输入密码查看</p>
+                    <input type="password" class="private-lock-input" id="private-input" placeholder="密码" autocomplete="off">
+                    <div><button class="private-lock-btn" id="private-btn">解锁</button></div>
+                    <p class="private-lock-error" id="private-error">密码错误，请重试</p>
+                </div>
+
+                <div class="post-content" id="post-content" hidden></div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>叹雪的小本本</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    <script>
+        (function() {
+            // 主题（精简版）
+            var theme = localStorage.getItem('theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            function applyTheme(t) {
+                document.documentElement.setAttribute('data-theme', t);
+                localStorage.setItem('theme', t);
+                var btn = document.getElementById('theme-btn');
+                if (btn) btn.querySelector('i').className = t === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+                var hljsTheme = document.getElementById('hljs-theme');
+                if (hljsTheme) {
+                    hljsTheme.href = t === 'dark'
+                        ? 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css'
+                        : 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css';
+                }
+            }
+            applyTheme(theme);
+            document.getElementById('theme-btn').onclick = function() {
+                theme = theme === 'light' ? 'dark' : 'light';
+                applyTheme(theme);
+            };
+
+            // 阅读进度条
+            var progressBar = document.getElementById('progress-bar');
+            window.addEventListener('scroll', function() {
+                requestAnimationFrame(function() {
+                    var h = document.documentElement;
+                    var max = h.scrollHeight - h.clientHeight;
+                    progressBar.style.transform = 'scaleX(' + (max > 0 ? h.scrollTop / max : 0) + ')';
+                });
+            }, { passive: true });
+
+            // 解密
+            var SALT = 'vZeKTF7cmZPWF74tLcyNsg==';
+            var PAYLOAD = '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';
+
+            function b64ToBuf(b64) {
+                var bin = atob(b64);
+                var buf = new Uint8Array(bin.length);
+                for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+                return buf.buffer;
+            }
+
+            function unlock() {
+                var pwd = document.getElementById('private-input').value;
+                if (!pwd) return;
+                var enc = new TextEncoder();
+                crypto.subtle.importKey('raw', enc.encode(pwd), 'PBKDF2', false, ['deriveKey'])
+                    .then(function(material) {
+                        return crypto.subtle.deriveKey(
+                            { name: 'PBKDF2', salt: b64ToBuf(SALT), iterations: 210000, hash: 'SHA-256' },
+                            material,
+                            { name: 'AES-GCM', length: 256 },
+                            false,
+                            ['decrypt']
+                        );
+                    })
+                    .then(function(key) {
+                        var data = new Uint8Array(b64ToBuf(PAYLOAD));
+                        var iv = data.slice(0, 12);
+                        var ct = data.slice(12);
+                        return crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ct);
+                    })
+                    .then(function(plain) {
+                        var md = new TextDecoder().decode(plain);
+                        var contentEl = document.getElementById('post-content');
+                        contentEl.innerHTML = marked.parse(md);
+                        var blocks = contentEl.querySelectorAll('pre code');
+                        for (var i = 0; i < blocks.length; i++) hljs.highlightElement(blocks[i]);
+                        var imgs = contentEl.querySelectorAll('img');
+                        for (var j = 0; j < imgs.length; j++) imgs[j].setAttribute('loading', 'lazy');
+                        document.getElementById('private-lock').hidden = true;
+                        contentEl.hidden = false;
+                    })
+                    .catch(function() {
+                        document.getElementById('private-error').classList.add('show');
+                        document.getElementById('private-input').select();
+                    });
+            }
+
+            document.getElementById('private-btn').onclick = unlock;
+            document.getElementById('private-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') unlock();
+            });
+            document.getElementById('private-input').focus();
+        })();
+    </script>
+</body>
+
+</html>

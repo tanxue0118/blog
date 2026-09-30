@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/jpeg" href="static/logo.jpg">
+    <meta name="description" content="叹雪的小本本 - 归档">
+    <meta property="og:site_name" content="叹雪的小本本">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="归档 - 叹雪的小本本">
+    <meta property="og:image" content="static/logo.jpg">
+    <title>归档 - 叹雪的小本本</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="static/style.css">
+</head>
+
+<body>
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-inner">
+            <div class="sidebar-header">
+                <div class="avatar">
+                    <img src="static/logo.jpg" alt="头像">
+                </div>
+                <h2 class="sidebar-name">叹雪</h2>
+                <p class="sidebar-bio">记录一切</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="index.html" class="sidebar-link">
+                    <i class="ri-home-4-line"></i>
+                    <span>首页</span>
+                </a>
+                <a href="archive.html" class="sidebar-link active">
+                    <i class="ri-archive-line"></i>
+                    <span>归档</span>
+                </a>
+                <a href="https://github.com/tanxue0118" target="_blank" class="sidebar-link">
+                    <i class="ri-github-line"></i>
+                    <span>GitHub</span>
+                </a>
+                <a href="https://tanxue.qzz.io/" target="_blank" class="sidebar-link">
+                    <i class="ri-links-line"></i>
+                    <span>个人主页</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-tags">
+                <h3 class="sidebar-section-title">标签</h3>
+                <div class="tag-list" id="archive-tag-list"></div>
+            </div>
+
+            <div class="sidebar-stats">
+                <h3 class="sidebar-section-title">统计</h3>
+                <img
+                    class="counter-image"
+                    src="https://count.getloli.com/@tanxue0118-blog?theme=moebooru&darkmode=auto"
+                    alt="主页访问统计"
+                >
+            </div>
+
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="ri-moon-line"></i>
+                    <span>深色模式</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 遮罩层 -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- 主内容 -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-btn" id="menu-btn">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <button class="sidebar-toggle" id="sidebar-toggle" title="收起侧边栏">
+                    <i class="ri-side-bar-line"></i>
+                </button>
+            </div>
+            <h1 class="topbar-title">归档</h1>
+            <button class="theme-btn" id="theme-btn">
+                <i class="ri-moon-line"></i>
+            </button>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <div id="archive-list">
+                    <p style="text-align:center;color:#999;padding:40px;">加载中...</p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>叹雪的小本本</p>
+        </footer>
+    </div>
+
+    <script src="static/script.js"></script>
+    <script>
+        (function() {
+            fetch('posts/data.json')
+                .then(function(r) {
+                    if (!r.ok) throw new Error('HTTP ' + r.status);
+                    return r.json();
+                })
+                .then(function(data) {
+                    var tagList = document.getElementById('archive-tag-list');
+                    if (tagList && data.tags) {
+                        var html = '';
+                        for (var j = 0; j < data.tags.length; j++) {
+                            var t = data.tags[j];
+                            var href = t === '全部' ? 'index.html' : 'index.html?tag=' + encodeURIComponent(t);
+                            html += '<a href="' + href + '" class="tag-item">' + t + '</a>';
+                        }
+                        tagList.innerHTML = html;
+                    }
+
+                    var listEl = document.getElementById('archive-list');
+                    var privateIds = {};
+                    (data.private_posts || []).forEach(function(id) { privateIds[id] = true; });
+                    var posts = (data.posts || []).filter(function(p) { return !privateIds[p.id]; });
+                    if (!posts.length) {
+                        listEl.innerHTML = '<p style="text-align:center;color:#999;padding:40px;">暂无文章</p>';
+                        return;
+                    }
+
+                    // 按日期倒序，再按 年→月 分组
+                    var sorted = posts.slice().sort(function(a, b) {
+                        return (b.date || '').localeCompare(a.date || '');
+                    });
+
+                    var groups = {};
+                    var order = [];
+                    for (var i = 0; i < sorted.length; i++) {
+                        var p = sorted[i];
+                        var parts = (p.date || '').split('-');
+                        var year = parts[0] || '未知';
+                        var month = parts[1] || '';
+                        var key = year + '-' + month;
+                        if (!groups[key]) {
+                            groups[key] = { year: year, month: month, posts: [] };
+                            order.push(key);
+                        }
+                        groups[key].posts.push(p);
+                    }
+
+                    var html = '';
+                    var lastYear = null;
+                    for (var k = 0; k < order.length; k++) {
+                        var g = groups[order[k]];
+                        if (g.year !== lastYear) {
+                            html += '<h2 class="archive-year">' + g.year + ' 年</h2>';
+                            lastYear = g.year;
+                        }
+                        if (g.month) {
+                            html += '<h3 class="archive-month">' + parseInt(g.month, 10) + ' 月</h3>';
+                        }
+                        for (var m = 0; m < g.posts.length; m++) {
+                            var post = g.posts[m];
+                            var day = (post.date || '').split('-')[2] || '';
+                            html += '<div class="archive-item">';
+                            html += '<span class="archive-date">' + day + '</span>';
+                            html += '<a class="archive-link" href="p/' + encodeURIComponent(post.id) + '/">' + post.title + '</a>';
+                            html += '</div>';
+                        }
+                    }
+                    listEl.innerHTML = html;
+                })
+                .catch(function(err) {
+                    console.error('加载失败:', err);
+                    document.getElementById('archive-list').innerHTML =
+                        '<p style="text-align:center;color:#999;padding:40px;">加载失败</p>';
+                });
+        })();
+    </script>
+</body>
+
+</html>

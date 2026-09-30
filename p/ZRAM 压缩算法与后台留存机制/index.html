@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/jpeg" href="../../static/logo.jpg">
+    <meta name="description" content="梳理 ZRAM、swap、writeback、swappiness、LMKD、kswapd、水位线与 MGLRU 对后台留存的影响">
+    <title>ZRAM 压缩算法与后台留存机制 - 叹雪的小本本</title>
+    <meta property="og:site_name" content="叹雪的小本本">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="ZRAM 压缩算法与后台留存机制">
+    <meta property="og:description" content="梳理 ZRAM、swap、writeback、swappiness、LMKD、kswapd、水位线与 MGLRU 对后台留存的影响">
+    <meta property="og:image" content="https://tanxue0118.github.io/blog/static/logo.jpg">
+    <meta property="article:published_time" content="2026-06-26">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="../../static/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css" id="hljs-theme">
+</head>
+
+<body>
+    <!-- 阅读进度条 -->
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-inner">
+            <div class="sidebar-header">
+                <div class="avatar">
+                    <img src="../../static/logo.jpg" alt="头像">
+                </div>
+                <h2 class="sidebar-name">叹雪</h2>
+                <p class="sidebar-bio">记录一切</p>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="../../index.html" class="sidebar-link">
+                    <i class="ri-home-4-line"></i>
+                    <span>首页</span>
+                </a>
+                <a href="../../archive.html" class="sidebar-link">
+                    <i class="ri-archive-line"></i>
+                    <span>归档</span>
+                </a>
+                <a href="https://github.com/tanxue0118" target="_blank" class="sidebar-link">
+                    <i class="ri-github-line"></i>
+                    <span>GitHub</span>
+                </a>
+                <a href="https://tanxue.qzz.io/" target="_blank" class="sidebar-link">
+                    <i class="ri-links-line"></i>
+                    <span>个人主页</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-tags">
+                <h3 class="sidebar-section-title">标签</h3>
+                <div class="tag-list" id="page-tag-list"></div>
+            </div>
+
+            <div class="sidebar-stats">
+                <h3 class="sidebar-section-title">统计</h3>
+                <img class="counter-image"
+                     src="https://count.getloli.com/@ZRAM 压缩算法与后台留存机制?theme=moebooru&darkmode=auto"
+                     alt="文章访问统计">
+            </div>
+
+            <div class="sidebar-footer">
+                <button id="theme-toggle" class="theme-toggle">
+                    <i class="ri-moon-line"></i>
+                    <span>深色模式</span>
+                </button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 遮罩层 -->
+    <div class="overlay" id="overlay"></div>
+
+    <!-- 主内容 -->
+    <div class="main-wrapper">
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="menu-btn" id="menu-btn">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <button class="sidebar-toggle" id="sidebar-toggle" title="收起侧边栏">
+                    <i class="ri-side-bar-line"></i>
+                </button>
+            </div>
+            <h1 class="topbar-title">ZRAM 压缩算法与后台留存机制</h1>
+            <button class="theme-btn" id="theme-btn">
+                <i class="ri-moon-line"></i>
+            </button>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <a href="../../index.html" class="back-link">← 返回首页</a>
+
+                <article class="post-header">
+                    <h1 class="post-title">ZRAM 压缩算法与后台留存机制</h1>
+                    <div class="post-meta">
+                        <time>2026-06-26</time>
+                        <span><span class="tag tag-green">Android</span><span class="tag tag-blue">Linux</span><span class="tag tag-blue">技术</span></span>
+                    </div>
+                </article>
+
+                <div class="post-content" id="post-content">
+                    <p>加载中...</p>
+                </div>
+
+                <nav class="post-nav" id="post-nav">
+                    <a href="../%E7%BA%BF%E7%A8%8B%E5%88%86%E9%85%8D%E4%B8%8E%20CPU%20%E4%BA%B2%E5%92%8C%E6%80%A7%E8%A7%84%E5%88%99%E6%95%B4%E7%90%86/" class="post-nav-link prev"><span class="post-nav-label">← 上一篇</span><span class="post-nav-title">线程分配与 CPU 亲和性规则整理（整理自酷安@Aloazny）</span></a>
+                    <a href="../%E4%B8%AD%E5%9B%BD%E8%BF%91%E7%8E%B0%E4%BB%A3%E5%8F%B2%E7%BA%B2%E8%A6%81_%E7%9F%A5%E8%AF%86%E7%82%B9%E6%80%BB%E7%BB%93.md/" class="post-nav-link next"><span class="post-nav-label">下一篇 →</span><span class="post-nav-title">中国近现代史纲要_知识点总结</span></a>
+                </nav>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>叹雪的小本本</p>
+        </footer>
+    </div>
+
+    <!-- 图片灯箱 -->
+    <div class="lightbox" id="lightbox">
+        <img id="lightbox-img" alt="">
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    <script src="../../static/script.js"></script>
+    <script>
+        (function() {
+            var contentEl = document.getElementById('post-content');
+
+            // 阅读进度条
+            var progressBar = document.getElementById('progress-bar');
+            if (progressBar) {
+                var ticking = false;
+                window.addEventListener('scroll', function() {
+                    if (!ticking) {
+                        requestAnimationFrame(function() {
+                            var h = document.documentElement;
+                            var max = h.scrollHeight - h.clientHeight;
+                            progressBar.style.transform = 'scaleX(' + (max > 0 ? h.scrollTop / max : 0) + ')';
+                            ticking = false;
+                        });
+                        ticking = true;
+                    }
+                }, { passive: true });
+            }
+
+            // 图片灯箱
+            var lightbox = document.getElementById('lightbox');
+            var lightboxImg = document.getElementById('lightbox-img');
+
+            function closeLightbox() {
+                lightbox.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+
+            if (lightbox) {
+                lightbox.onclick = closeLightbox;
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && lightbox.classList.contains('show')) closeLightbox();
+                });
+            }
+
+            // 加载标签
+            fetch('../../posts/data.json')
+                .then(function(r) { return r.json(); })
+                .then(function(data) {
+                    var tagList = document.getElementById('page-tag-list');
+                    if (tagList && data.tags) {
+                        var html = '';
+                        for (var j = 0; j < data.tags.length; j++) {
+                            var t = data.tags[j];
+                            var href = t === '全部' ? '../../index.html' : '../../index.html?tag=' + encodeURIComponent(t);
+                            html += '<a href="' + href + '" class="tag-item">' + t + '</a>';
+                        }
+                        tagList.innerHTML = html;
+                    }
+                })
+                .catch(function() {});
+
+            // 加载正文
+            fetch('../../posts/ZRAM 压缩算法与后台留存机制.md')
+                .then(function(r) {
+                    if (!r.ok) throw new Error('MD HTTP ' + r.status);
+                    return r.text();
+                })
+                .then(function(md) {
+                    contentEl.innerHTML = marked.parse(md);
+                    var blocks = contentEl.querySelectorAll('pre code');
+                    for (var i = 0; i < blocks.length; i++) {
+                        hljs.highlightElement(blocks[i]);
+                    }
+
+                    // 图片路径修正（md 里的相对路径基于 posts/ 目录）
+                    var imgs = contentEl.querySelectorAll('img');
+                    for (var j = 0; j < imgs.length; j++) {
+                        var src = imgs[j].getAttribute('src');
+                        if (src && src.indexOf('http') !== 0 && src.indexOf('/') !== 0) {
+                            imgs[j].src = '../../posts/' + src;
+                        }
+                        imgs[j].setAttribute('loading', 'lazy');
+                        imgs[j].onclick = function() {
+                            if (!lightbox) return;
+                            lightboxImg.src = this.src;
+                            lightboxImg.alt = this.alt || '';
+                            lightbox.classList.add('show');
+                            document.body.style.overflow = 'hidden';
+                        };
+                    }
+                })
+                .catch(function(err) {
+                    console.error('加载失败:', err);
+                    contentEl.innerHTML = '<p>加载文章内容失败。</p>';
+                });
+        })();
+    </script>
+</body>
+
+</html>

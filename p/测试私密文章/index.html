@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/jpeg" href="../../static/logo.jpg">
+    <meta name="robots" content="noindex, nofollow">
+    <title>测试私密文章 - 叹雪的小本本</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="../../static/style.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css" id="hljs-theme">
+    <style>
+        .private-lock { text-align: center; padding: 64px 0; }
+        .private-lock-icon { font-size: 40px; color: var(--text-muted); margin-bottom: 16px; }
+        .private-lock-text { font-size: 15px; color: var(--text-secondary); margin-bottom: 24px; }
+        .private-lock-input {
+            width: min(100%, 320px); padding: 12px 14px; font-size: 15px;
+            border: 1px solid var(--border); border-radius: 8px;
+            background: var(--bg-soft); color: var(--text);
+            font-family: inherit; outline: none; text-align: center;
+            transition: border-color 0.2s;
+        }
+        .private-lock-input:focus { border-color: var(--accent); }
+        .private-lock-btn {
+            margin-top: 12px; padding: 10px 28px; border: none; border-radius: 8px;
+            background: var(--accent); color: #fff; font-size: 14px; font-family: inherit;
+            cursor: pointer; transition: opacity 0.2s;
+        }
+        .private-lock-btn:hover { opacity: 0.85; }
+        .private-lock-error { margin-top: 12px; font-size: 13px; color: #dc2626; display: none; }
+        .private-lock-error.show { display: block; }
+    </style>
+</head>
+
+<body>
+    <!-- 阅读进度条 -->
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- 主内容（无侧边栏） -->
+    <div class="main-wrapper" style="margin-left:0">
+        <header class="topbar">
+            <div class="topbar-left"></div>
+            <h1 class="topbar-title">测试私密文章</h1>
+            <button class="theme-btn" id="theme-btn">
+                <i class="ri-moon-line"></i>
+            </button>
+        </header>
+
+        <main class="main">
+            <div class="container">
+                <article class="post-header">
+                    <h1 class="post-title">测试私密文章</h1>
+                    <div class="post-meta">
+                        <time>2026-09-30</time>
+                    </div>
+                </article>
+
+                <div class="private-lock" id="private-lock">
+                    <div class="private-lock-icon"><i class="ri-lock-2-line"></i></div>
+                    <p class="private-lock-text">这是一篇私密文章，请输入密码查看</p>
+                    <input type="password" class="private-lock-input" id="private-input" placeholder="密码" autocomplete="off">
+                    <div><button class="private-lock-btn" id="private-btn">解锁</button></div>
+                    <p class="private-lock-error" id="private-error">密码错误，请重试</p>
+                </div>
+
+                <div class="post-content" id="post-content" hidden></div>
+            </div>
+        </main>
+
+        <footer class="footer">
+            <p>叹雪的小本本</p>
+        </footer>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+    <script>
+        (function() {
+            // 主题（精简版）
+            var theme = localStorage.getItem('theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            function applyTheme(t) {
+                document.documentElement.setAttribute('data-theme', t);
+                localStorage.setItem('theme', t);
+                var btn = document.getElementById('theme-btn');
+                if (btn) btn.querySelector('i').className = t === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+                var hljsTheme = document.getElementById('hljs-theme');
+                if (hljsTheme) {
+                    hljsTheme.href = t === 'dark'
+                        ? 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css'
+                        : 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-light.min.css';
+                }
+            }
+            applyTheme(theme);
+            document.getElementById('theme-btn').onclick = function() {
+                theme = theme === 'light' ? 'dark' : 'light';
+                applyTheme(theme);
+            };
+
+            // 阅读进度条
+            var progressBar = document.getElementById('progress-bar');
+            window.addEventListener('scroll', function() {
+                requestAnimationFrame(function() {
+                    var h = document.documentElement;
+                    var max = h.scrollHeight - h.clientHeight;
+                    progressBar.style.transform = 'scaleX(' + (max > 0 ? h.scrollTop / max : 0) + ')';
+                });
+            }, { passive: true });
+
+            // 解密
+            var SALT = 'vZeKTF7cmZPWF74tLcyNsg==';
+            var PAYLOAD = 'NofJh87DljvNizznTQjZg9ux31QPnjolbPz4GkF1r3Hkhvf9OOu0Jxm+z8wSKE0WTGjemQA52HnncckzZgWCGqtZGq3eIoNLYfuNAMubIDlww4T/EWEt3CR68fnrN/3n99YhkbUVwWJUVo/aXNMnDT+eveVPz0kKm2pkFWEx3NiZiRlRIbEOILcutUWbujfeZ8j0X1ZVsJ7HTBggzXUJ59kXylf4YRgpYpdZHz+c4/Lb7M9n/nC7QEwmmHyM/Zdt0A2Ma1nGj+OZqTNlVd0e/6QPTD6lev9bS1dEirMSgh5WsS3//PbGuz3wqLzsOIlhxzda8tjv4+Nw2oQbO7D3N1F6b786CfqDZaPASWtG04Z3mTsdyLb8+Lxn0EsxJFC/2+pKqp8dqEZpY0BiR1MFJ79CnkOichBAJG/73ptQvYveBw==';
+
+            function b64ToBuf(b64) {
+                var bin = atob(b64);
+                var buf = new Uint8Array(bin.length);
+                for (var i = 0; i < bin.length; i++) buf[i] = bin.charCodeAt(i);
+                return buf.buffer;
+            }
+
+            function unlock() {
+                var pwd = document.getElementById('private-input').value;
+                if (!pwd) return;
+                var enc = new TextEncoder();
+                crypto.subtle.importKey('raw', enc.encode(pwd), 'PBKDF2', false, ['deriveKey'])
+                    .then(function(material) {
+                        return crypto.subtle.deriveKey(
+                            { name: 'PBKDF2', salt: b64ToBuf(SALT), iterations: 210000, hash: 'SHA-256' },
+                            material,
+                            { name: 'AES-GCM', length: 256 },
+                            false,
+                            ['decrypt']
+                        );
+                    })
+                    .then(function(key) {
+                        var data = new Uint8Array(b64ToBuf(PAYLOAD));
+                        var iv = data.slice(0, 12);
+                        var ct = data.slice(12);
+                        return crypto.subtle.decrypt({ name: 'AES-GCM', iv: iv }, key, ct);
+                    })
+                    .then(function(plain) {
+                        var md = new TextDecoder().decode(plain);
+                        var contentEl = document.getElementById('post-content');
+                        contentEl.innerHTML = marked.parse(md);
+                        var blocks = contentEl.querySelectorAll('pre code');
+                        for (var i = 0; i < blocks.length; i++) hljs.highlightElement(blocks[i]);
+                        var imgs = contentEl.querySelectorAll('img');
+                        for (var j = 0; j < imgs.length; j++) imgs[j].setAttribute('loading', 'lazy');
+                        document.getElementById('private-lock').hidden = true;
+                        contentEl.hidden = false;
+                    })
+                    .catch(function() {
+                        document.getElementById('private-error').classList.add('show');
+                        document.getElementById('private-input').select();
+                    });
+            }
+
+            document.getElementById('private-btn').onclick = unlock;
+            document.getElementById('private-input').addEventListener('keydown', function(e) {
+                if (e.key === 'Enter') unlock();
+            });
+            document.getElementById('private-input').focus();
+        })();
+    </script>
+</body>
+
+</html>

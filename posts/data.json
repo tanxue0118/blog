@@ -1,0 +1,74 @@
+﻿{
+  "site": {
+    "name": "叹雪",
+    "bio": "记录玩机经历以及经验",
+    "avatar": "static/logo.jpg"
+  },
+  "tags": ["全部", "Android", "技术","Linux", "底层", "恋爱那点事"],
+  "private_posts": ["测试私密文章", "关于初吻"],
+  "posts": [
+    {
+      "id": "测试私密文章",
+      "title": "测试私密文章",
+      "date": "2026-09-30",
+      "tags": ["技术"],
+      "excerpt": "测试私密文章功能"
+    },
+    {
+      "id": "关于初吻",
+      "title": "关于初吻（收录自可爱的小女友）",
+      "date": "2026-07-06",
+      "tags": ["恋爱那点事"],
+      "excerpt": "一个口嗨姐和真实哥，从反复亲嘴三连问到初吻悄然落幕的小故事"
+    },
+    {
+      "id": "关于充电方面的问题",
+      "title": "关于充电方面的问题",
+      "date": "2026-07-01",
+      "tags": ["Android", "底层"],
+      "excerpt": "梳理手机快充受电池、BMS、充电协议、线材内阻、纹波和温控策略影响的原因"
+    },
+    {
+      "id": "如何清理垃圾进程",
+      "title": "如何清理垃圾进程",
+      "date": "2026-06-29",
+      "tags": ["Android", "Linux"],
+      "excerpt": "研究该如何杀死无用进程"
+    },
+    {
+      "id": "SQLite VACUUM 数据库优化技术",
+      "title": "SQLite VACUUM 数据库优化技术（整理自酷安@海边会下雪么）",
+      "date": "2026-06-26",
+      "tags": ["Android", "技术"],
+      "excerpt": "详解 SQLite VACUUM 的工作原理、空间回收判断、WAL 注意事项，以及数据库整理的执行策略"
+    },
+    {
+      "id": "定时方案",
+      "title": "定时方案epoll+timerfd（收录自酷安@海边会下雪么）",
+      "date": "2026-06-26",
+      "tags": ["Linux", "技术"],
+      "excerpt": "整理 epoll、timerfd、小顶堆和 inotify 的定时任务调度思路，兼顾低开销与可读性"
+    },
+    {
+      "id": "线程分配与 CPU 亲和性规则整理",
+      "title": "线程分配与 CPU 亲和性规则整理（整理自酷安@Aloazny）",
+      "date": "2026-06-26",
+      "tags": ["Android", "技术"],
+      "excerpt": "整理线程名匹配、CPU 核心亲和、日常应用、游戏和子进程的线程分配思路"
+    },
+    {
+      "id": "ZRAM 压缩算法与后台留存机制",
+      "title": "ZRAM 压缩算法与后台留存机制",
+      "date": "2026-06-26",
+      "tags": ["Android", "Linux", "技术"],
+      "excerpt": "梳理 ZRAM、swap、writeback、swappiness、LMKD、kswapd、水位线与 MGLRU 对后台留存的影响"
+    },
+    {
+      "id": "中国近现代史纲要_知识点总结.md",
+      "title": "中国近现代史纲要_知识点总结",
+      "date": "2026-06-26",
+      "tags": ["技术"],
+      "excerpt": "总结中国近现代史纲要中的重要知识点"
+    }
+  ]
+}
